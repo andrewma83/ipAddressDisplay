@@ -9,12 +9,13 @@
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController {
-    UILabel *_ipAddress;
+    UILabel *_privateIP;
     UILabel *_netmask;
-    UILabel *_gateway;
+    UILabel *_globalIP;
+    NSDictionary *jsonDict;
 }
 
-@property (nonatomic) IBOutlet UILabel *ipAddress;
+@property (nonatomic) IBOutlet UILabel *privateIP;
 @property (nonatomic) IBOutlet UILabel *netmask;
-@property (nonatomic) IBOutlet UILabel *gateway;
+@property (nonatomic) IBOutlet UILabel *globalIP;
 @end

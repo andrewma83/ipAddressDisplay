@@ -15,7 +15,35 @@
 
 @implementation ViewController
 
+- (void) fetchGlobalIP
+{
+    NSString *urlStr = @"http://zerotester.dontexist.org/rss/get_client_ip.php";
+    NSURL *url = [[NSURL alloc] initWithString:urlStr];
+    @try {
+        [NSURLConnection sendAsynchronousRequest:[[NSURLRequest alloc] initWithURL:url]
+                                           queue:[[NSOperationQueue alloc] init]
+                               completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                                   NSString *ipaddress;
+                                   jsonDict = [NSJSONSerialization JSONObjectWithData:data
+                                                                              options:kNilOptions
+                                                                                error:&error];
+                                   
+                                   ipaddress = [jsonDict valueForKey:@"client_ip"];
+                                   [self performSelectorOnMainThread:@selector(update_global_ip:)
+                                                          withObject:ipaddress
+                                                       waitUntilDone:YES];
+                               }];
+    } @catch (NSException *e) {
+        NSLog(@"exception %@", e);
+    }
+    
+}
 
+- (void) update_global_ip:(id) data
+{
+    NSString *ip = (NSString *) data;
+    [_globalIP setText:ip];
+}
 
 - (NSArray *)getIPAddress {
     NSArray *retval;
@@ -51,16 +79,14 @@
 -(void)timer:(id) userInfo
 {
     NSArray *result = [self getIPAddress];
-    [_ipAddress setText:result[0]];
+    [_privateIP setText:result[0]];
     [_netmask setText:result[1]];
+    [self fetchGlobalIP];
 }
 
 -(void)viewDidAppear:(BOOL)animated
 {
-    NSArray *result = [self getIPAddress];
-    [_ipAddress setText:result[0]];
-    [_netmask setText:result[1]];
-    
+    [self timer:nil];
     [NSTimer scheduledTimerWithTimeInterval:2.0
                                      target:self
                                    selector:@selector(timer:)
@@ -72,7 +98,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-
+    
 }
 
 
